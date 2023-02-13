@@ -2,6 +2,7 @@
   "name": "editor-test",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://Edgar-Nik.github.io/Editor-js",
   "dependencies": {
     "@editorjs/editorjs": "^2.26.5",
     "@editorjs/header": "^2.7.0",
@@ -19,6 +20,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -43,6 +46,7 @@
     ]
   },
   "devDependencies": {
-    "@types/editorjs__header": "^2.6.0"
+    "@types/editorjs__header": "^2.6.0",
+    "gh-pages": "^5.0.0"
   }
 }

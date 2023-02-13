@@ -1,8 +1,8 @@
-import { default as React, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import EditorJS from '@editorjs/editorjs';
 import Header from '@editorjs/header';
 
-const DEFAULT_INITIAL_DATA = () => {
+const initialData = () => {
   return {
     time: new Date().getTime(),
     blocks: [
@@ -17,13 +17,10 @@ const DEFAULT_INITIAL_DATA = () => {
   };
 };
 
-const EDITTOR_HOLDER_ID = 'editorjs';
-
-const Editor = (props: any) => {
+const Editor = () => {
   const ejInstance = useRef<any>();
-  const [editorData, setEditorData] = React.useState(DEFAULT_INITIAL_DATA);
+  const [editorData, setEditorData] = useState(initialData);
 
-  // This will run only once
   useEffect(() => {
     if (!ejInstance.current) {
       initEditor();
@@ -38,7 +35,7 @@ const Editor = (props: any) => {
 
   const initEditor = () => {
     const editor = new EditorJS({
-      holder: EDITTOR_HOLDER_ID,
+      holder: 'editorjs',
       data: editorData,
       onReady: () => {
         ejInstance.current = editor;
@@ -56,9 +53,9 @@ const Editor = (props: any) => {
   };
 
   return (
-    <React.Fragment>
-      <div id={EDITTOR_HOLDER_ID}> </div>
-    </React.Fragment>
+    <>
+      <div id="editorjs" />
+    </>
   );
 };
 
