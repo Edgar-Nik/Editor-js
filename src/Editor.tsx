@@ -1,6 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import Checklist from '@editorjs/checklist';
 import EditorJS from '@editorjs/editorjs';
-import Header from '@editorjs/header';
+import Embed from '@editorjs/embed';
+import List from '@editorjs/list';
+import RawTool from '@editorjs/raw';
+import SimpleImage from '@editorjs/simple-image';
+import { useEffect, useRef, useState } from 'react';
+const Header = require('@editorjs/header');
 
 const initialData = () => {
   return {
@@ -11,6 +16,12 @@ const initialData = () => {
         data: {
           text: 'Hello)',
           level: 1
+        }
+      },
+      {
+        type: "image",
+        data: {
+          "url": "https://images.hgmsites.net/hug/nissan-gt-r_100758125_h.jpg"
         }
       }
     ]
@@ -47,7 +58,43 @@ const Editor = () => {
       },
       autofocus: true,
       tools: {
-        header: Header
+        header: {
+          class: Header,
+          inlineToolbar: ['link'],
+          shortcut: 'CMD+SHIFT+H',
+          config: {
+            placeholder: 'Enter a header',
+            levels: [1, 2, 3, 4],
+            defaultLevel: 2
+          }
+        },
+        checklist: {
+          class: Checklist,
+          inlineToolbar: true,
+          shortcut: 'CMD+SHIFT+L',
+        },
+        list: {
+          class: List,
+          inlineToolbar: true,
+          config: {
+            defaultStyle: 'unordered'
+          }
+        },
+        raw: RawTool,
+        image: {
+          class: SimpleImage,
+          inlineToolbar: true
+        },
+        embed: {
+          class: Embed,
+          inlineToolbar: true,
+          config: {
+            services: {
+              youtube: true,
+              coub: true
+            }
+          }
+        },
       }
     });
   };
