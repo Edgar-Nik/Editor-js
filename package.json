@@ -52,6 +52,7 @@
     "@editorjs/raw": "^2.4.0",
     "@editorjs/simple-image": "^1.5.1",
     "@types/editorjs__header": "^2.6.0",
+    "editorjs-drag-drop": "^1.1.13",
     "gh-pages": "^5.0.0"
   }
 }

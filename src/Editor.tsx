@@ -5,6 +5,7 @@ import List from '@editorjs/list';
 import RawTool from '@editorjs/raw';
 import SimpleImage from '@editorjs/simple-image';
 import { useEffect, useRef, useState } from 'react';
+import DragDrop from 'editorjs-drag-drop';
 const Header = require('@editorjs/header');
 
 const initialData = () => {
@@ -50,6 +51,7 @@ const Editor = () => {
       data: editorData,
       onReady: () => {
         ejInstance.current = editor;
+        new DragDrop(editor);
       },
       onChange: async (e) => {
         let content = await e.saver.save();
