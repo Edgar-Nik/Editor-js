@@ -86,37 +86,46 @@ const Editor = () => {
         if (event.type !== 'block-changed') {
           return;
         }
-
         const id: string = event.detail.target.id;
 
-        api.saver.save().then((content) => {
-          let reRender = false;
+        const content = await api.saver.save();
+        let currentBlock = content.blocks.find((item) => item.id === id);
 
-          if (id) {
-            let currentBlock = content.blocks.find((item) => item.id === id);
+        const updatedBlocks = {
+          time: new Date().getTime(),
+          blocks: content.blocks.map((item) => (item.id === id ? { ...item, data: { ...currentBlock?.data } } : item))
+        };
+        setEditorData({ ...updatedBlocks });
+        // const id: string = event.detail.target.id;
 
-            if (currentBlock) {
-              if (currentBlock.data?.text) {
-                const text = currentBlock.data?.text;
-                reRender = bold.test(currentBlock.data?.text);
-                currentBlock.data = { ...currentBlock.data, text: markdownParser(text) };
-              }
-            }
-            const updatedBlocks = {
-              time: new Date().getTime(),
-              blocks: content.blocks.map((item) =>
-                item.id === id ? { ...item, data: { ...currentBlock?.data } } : item
-              )
-            };
+        // api.saver.save().then((content) => {
+        //   let reRender = false;
 
-            if (currentBlock?.id && reRender) {
-              if (reRender) {
-                api.blocks.update(currentBlock.id, { ...currentBlock.data });
-              }
-            }
-            setEditorData({ ...updatedBlocks });
-          }
-        });
+        //   if (id) {
+        //     let currentBlock = content.blocks.find((item) => item.id === id);
+
+        //     if (currentBlock) {
+        //       if (currentBlock.data?.text) {
+        //         const text = currentBlock.data?.text;
+        //         reRender = bold.test(currentBlock.data?.text);
+        //         currentBlock.data = { ...currentBlock.data, text: markdownParser(text) };
+        //       }
+        //     }
+        //     const updatedBlocks = {
+        //       time: new Date().getTime(),
+        //       blocks: content.blocks.map((item) =>
+        //         item.id === id ? { ...item, data: { ...currentBlock?.data } } : item
+        //       )
+        //     };
+
+        //     if (currentBlock?.id && reRender) {
+        //       if (reRender) {
+        //         api.blocks.update(currentBlock.id, { ...currentBlock.data });
+        //       }
+        //     }
+        //     setEditorData({ ...updatedBlocks });
+        //   }
+        // });
       },
       autofocus: true,
       tools: {
