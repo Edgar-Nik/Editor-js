@@ -10,64 +10,41 @@ import { useEffect, useRef, useState } from 'react';
 import DragDrop from 'editorjs-drag-drop';
 
 const bold = /\*\*(.*)\*\*/gim;
-const italics = /\*(.*)\*/gim;
 
-const markdownParser = (text: string) => {
+let lastOffsetKey = 1;
+const time = new Date().getTime();
+
+const markdownParser = (text: string, offsetKey: number) => {
   let tmp = text;
-  const toHTML = tmp.replace(bold, '<b>$1</b>&#8203;');
+  const toHTML = tmp.replace(bold, `<b>$1</b>&#8203;<span data-offset-key="${time}-${offsetKey}"></span>`);
+
   return toHTML;
 };
 
 class MyParagraph extends Paragraph {
   constructor({ data, api, config, readOnly, block }: any) {
     super({ data, api, config, readOnly, block });
-    //@ts-ignore
-    this._element.addEventListener('keyup', (e) => {
-      // if (bold.test(e.target.innerHTML) || italics.test(e.target.innerHTML)) {
-      //   // if ('Enter' === e.code) {
-      //   //@ts-ignore
-      //   this._element.innerHTML = markdownParser(e.target.innerHTML);
-      //   //@ts-ignore
-      //   const p = this._element as any;
-      //   //@ts-ignore
-      //   const length = p.lastChild?.innerHTML ? 1 : p.lastChild.length;
-
-      //   const s = window.getSelection();
-      //   const r = document.createRange();
-      //   r.setStart(p.lastChild, length);
-      //   r.setEnd(p.lastChild, length);
-      //   s?.removeAllRanges();
-      //   s?.addRange(r);
-      //   // }
-      // }
-      const a = window.getSelection();
-      console.log('before', a);
+    this._element.addEventListener('keyup', (e: any) => {
       if (bold.test(e.target.innerHTML)) {
         //@ts-ignore
-        this._element.innerHTML = markdownParser(e.target.innerHTML);
-        //@ts-ignore
-        const element = this._element as any;
-        console.log(element.lastChild);
-        //   //@ts-ignore
-        const length = element.lastChild?.innerHTML ? 1 : element.lastChild.length;
-
-        const s = window.getSelection();
-        console.log('selections 1', s);
-
-        const r = document.createRange();
-        r.setStart(element.lastChild, length);
-        r.setEnd(element.lastChild, length);
-        s?.removeAllRanges();
-        s?.addRange(r);
-
-        console.log('r 2', r);
+        this._element.innerHTML = markdownParser(e.target.innerHTML, lastOffsetKey);
+        const element = document.querySelector(`[data-offset-key="${time}-${lastOffsetKey}"]`);
+        lastOffsetKey += 1;
+        if (element) {
+          const s = window.getSelection();
+          const r = document.createRange();
+          r.setStart(element, 0);
+          r.setEnd(element, 0);
+          s?.removeAllRanges();
+          s?.addRange(r);
+        }
       }
     });
   }
 
   save(blockContent: any) {
     const content = Paragraph.prototype.save(blockContent);
-    return { ...content, text: markdownParser(content.text) };
+    return { ...content, text: markdownParser(content.text, lastOffsetKey++) };
   }
 }
 
