@@ -14,31 +14,53 @@ const italics = /\*(.*)\*/gim;
 
 const markdownParser = (text: string) => {
   let tmp = text;
-  const toHTML = tmp.replace(bold, '<b>$1</b>').replace(italics, '<i>$1</i>');
-  return toHTML.trim();
+  const toHTML = tmp.replace(bold, '<b>$1</b>&#8203;');
+  return toHTML;
 };
 
 class MyParagraph extends Paragraph {
   constructor({ data, api, config, readOnly, block }: any) {
     super({ data, api, config, readOnly, block });
     //@ts-ignore
-    this._element.addEventListener('keydown', (e) => {
-      if (bold.test(e.target.innerHTML) || italics.test(e.target.innerHTML)) {
-        if ('Enter' === e.code) {
-          //@ts-ignore
-          this._element.innerHTML = markdownParser(e.target.innerHTML);
-          //@ts-ignore
-          const p = this._element as any;
-          //@ts-ignore
-          const length = p.lastChild?.innerHTML ? 1 : p.lastChild.length;
+    this._element.addEventListener('keyup', (e) => {
+      // if (bold.test(e.target.innerHTML) || italics.test(e.target.innerHTML)) {
+      //   // if ('Enter' === e.code) {
+      //   //@ts-ignore
+      //   this._element.innerHTML = markdownParser(e.target.innerHTML);
+      //   //@ts-ignore
+      //   const p = this._element as any;
+      //   //@ts-ignore
+      //   const length = p.lastChild?.innerHTML ? 1 : p.lastChild.length;
 
-          const s = window.getSelection();
-          const r = document.createRange();
-          r.setStart(p.lastChild, length);
-          r.setEnd(p.lastChild, length);
-          s?.removeAllRanges();
-          s?.addRange(r);
-        }
+      //   const s = window.getSelection();
+      //   const r = document.createRange();
+      //   r.setStart(p.lastChild, length);
+      //   r.setEnd(p.lastChild, length);
+      //   s?.removeAllRanges();
+      //   s?.addRange(r);
+      //   // }
+      // }
+      const a = window.getSelection();
+      console.log('before', a);
+      if (bold.test(e.target.innerHTML)) {
+        //@ts-ignore
+        this._element.innerHTML = markdownParser(e.target.innerHTML);
+        //@ts-ignore
+        const element = this._element as any;
+        console.log(element.lastChild);
+        //   //@ts-ignore
+        const length = element.lastChild?.innerHTML ? 1 : element.lastChild.length;
+
+        const s = window.getSelection();
+        console.log('selections 1', s);
+
+        const r = document.createRange();
+        r.setStart(element.lastChild, length);
+        r.setEnd(element.lastChild, length);
+        s?.removeAllRanges();
+        s?.addRange(r);
+
+        console.log('r 2', r);
       }
     });
   }
@@ -48,7 +70,6 @@ class MyParagraph extends Paragraph {
     return { ...content, text: markdownParser(content.text) };
   }
 }
-
 
 const initialData = () => {
   return {
@@ -62,9 +83,9 @@ const initialData = () => {
         }
       },
       {
-        type: "image",
+        type: 'image',
         data: {
-          "url": "https://images.hgmsites.net/hug/nissan-gt-r_100758125_h.jpg"
+          url: 'https://images.hgmsites.net/hug/nissan-gt-r_100758125_h.jpg'
         }
       }
     ]
@@ -110,7 +131,6 @@ const Editor = () => {
           blocks: content.blocks.map((item) => (item.id === id ? { ...item, data: { ...currentBlock?.data } } : item))
         };
         setEditorData({ ...updatedBlocks });
-       
       },
       autofocus: true,
       tools: {
@@ -136,7 +156,7 @@ const Editor = () => {
         checklist: {
           class: Checklist,
           inlineToolbar: true,
-          shortcut: 'CMD+SHIFT+L',
+          shortcut: 'CMD+SHIFT+L'
         },
         list: {
           class: List,
@@ -159,7 +179,7 @@ const Editor = () => {
               coub: true
             }
           }
-        },
+        }
       }
     });
   };
