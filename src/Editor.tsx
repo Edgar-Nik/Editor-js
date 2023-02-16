@@ -10,15 +10,21 @@ import { useEffect, useRef, useState } from 'react';
 import DragDrop from 'editorjs-drag-drop';
 
 const bold = /\*\*(.*)\*\*/gim;
+const italic = /(?<!\*)\*(?![*\s])(?:([^*]*[^*\s]))?\*/gim;
 
 let lastOffsetKey = 1;
 const time = new Date().getTime();
 
-const markdownParser = (text: string, offsetKey: number) => {
+const markdownParser = (text: string, offsetKey: number, tag: string) => {
   let tmp = text;
-  const toHTML = tmp.replace(bold, `<b>$1</b>&#8203;<span data-offset-key="${time}-${offsetKey}"></span>`);
-
-  return toHTML;
+  let helpers = `&#8203;<span data-offset-key="${time}-${offsetKey}"></span>`;
+  if (tag === 'bold') {
+    return tmp.replace(bold, `<b>$1</b>${helpers}`);
+  } else if (tag === 'italic') {
+    console.log(tmp.match(italic));
+    return tmp.replace(italic, `<i>$1</i>${helpers}`);
+  }
+  return tmp;
 };
 
 class MyParagraph extends Paragraph {
@@ -27,24 +33,22 @@ class MyParagraph extends Paragraph {
     this._element.addEventListener('keyup', (e: any) => {
       if (bold.test(e.target.innerHTML)) {
         //@ts-ignore
-        this._element.innerHTML = markdownParser(e.target.innerHTML, lastOffsetKey);
-        const element = document.querySelector(`[data-offset-key="${time}-${lastOffsetKey}"]`);
-        lastOffsetKey += 1;
-        if (element) {
-          const s = window.getSelection();
-          const r = document.createRange();
-          r.setStart(element, 0);
-          r.setEnd(element, 0);
-          s?.removeAllRanges();
-          s?.addRange(r);
-        }
+        this._element.innerHTML = markdownParser(e.target.innerHTML, lastOffsetKey, 'bold');
+      } else if (italic.test(e.target.innerHTML)) {
+        //@ts-ignore
+        this._element.innerHTML = markdownParser(e.target.innerHTML, lastOffsetKey, 'italic');
+      }
+      const element = document.querySelector(`[data-offset-key="${time}-${lastOffsetKey}"]`);
+      lastOffsetKey += 1;
+      if (element) {
+        const s = window.getSelection();
+        const r = document.createRange();
+        r.setStart(element, 0);
+        r.setEnd(element, 0);
+        s?.removeAllRanges();
+        s?.addRange(r);
       }
     });
-  }
-
-  save(blockContent: any) {
-    const content = Paragraph.prototype.save(blockContent);
-    return { ...content, text: markdownParser(content.text, lastOffsetKey++) };
   }
 }
 
@@ -57,12 +61,6 @@ const initialData = () => {
         data: {
           text: 'Hello)',
           level: 1
-        }
-      },
-      {
-        type: 'image',
-        data: {
-          url: 'https://images.hgmsites.net/hug/nissan-gt-r_100758125_h.jpg'
         }
       }
     ]
@@ -84,6 +82,10 @@ const Editor = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    console.log(editorData);
+  }, [editorData]);
 
   const initEditor = () => {
     const editor = new EditorJS({
