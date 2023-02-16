@@ -14,10 +14,9 @@ const initialData = () => {
     time: new Date().getTime(),
     blocks: [
       {
-        type: 'header',
+        type: 'paragraph',
         data: {
-          text: 'Hello)',
-          level: 1
+          text: ''
         }
       }
     ]
