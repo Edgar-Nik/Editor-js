@@ -9,48 +9,47 @@ import SimpleImage from '@editorjs/simple-image';
 import { useEffect, useRef, useState } from 'react';
 import DragDrop from 'editorjs-drag-drop';
 
-const bold = /\*\*(.*)\*\*/gim;
-const italic = /(?<!\*)\*(?![*\s])(?:([^*]*[^*\s]))?\*/gim;
+// const bold = /\*\*(.*)\*\*/gim;
+// const italic = /(?<!\*)\*(?![*\s])(?:([^*]*[^*\s]))?\*/gim;
 
-let lastOffsetKey = 1;
-const time = new Date().getTime();
+// let lastOffsetKey = 1;
+// const time = new Date().getTime();
 
-const markdownParser = (text: string, offsetKey: number, tag: string) => {
-  let tmp = text;
-  let helpers = `&#8203;<span data-offset-key="${time}-${offsetKey}"></span>`;
-  if (tag === 'bold') {
-    return tmp.replace(bold, `<b>$1</b>${helpers}`);
-  } else if (tag === 'italic') {
-    console.log(tmp.match(italic));
-    return tmp.replace(italic, `<i>$1</i>${helpers}`);
-  }
-  return tmp;
-};
+// const markdownParser = (text: string, offsetKey: number, tag: string) => {
+//   let tmp = text;
+//   let helpers = `&#8203;<span data-offset-key="${time}-${offsetKey}"></span>`;
+//   if (tag === 'bold') {
+//     return tmp.replace(bold, `<b>$1</b>${helpers}`);
+//   } else if (tag === 'italic') {
+//     return tmp.replace(italic, `<i>$1</i>${helpers}`);
+//   }
+//   return tmp;
+// };
 
-class MyParagraph extends Paragraph {
-  constructor({ data, api, config, readOnly, block }: any) {
-    super({ data, api, config, readOnly, block });
-    this._element.addEventListener('keyup', (e: any) => {
-      if (bold.test(e.target.innerHTML)) {
-        //@ts-ignore
-        this._element.innerHTML = markdownParser(e.target.innerHTML, lastOffsetKey, 'bold');
-      } else if (italic.test(e.target.innerHTML)) {
-        //@ts-ignore
-        this._element.innerHTML = markdownParser(e.target.innerHTML, lastOffsetKey, 'italic');
-      }
-      const element = document.querySelector(`[data-offset-key="${time}-${lastOffsetKey}"]`);
-      lastOffsetKey += 1;
-      if (element) {
-        const s = window.getSelection();
-        const r = document.createRange();
-        r.setStart(element, 0);
-        r.setEnd(element, 0);
-        s?.removeAllRanges();
-        s?.addRange(r);
-      }
-    });
-  }
-}
+// class MyParagraph extends Paragraph {
+//   constructor({ data, api, config, readOnly, block }: any) {
+//     super({ data, api, config, readOnly, block });
+//     this._element.addEventListener('keyup', (e: any) => {
+//       if (bold.test(e.target.innerHTML)) {
+//         //@ts-ignore
+//         this._element.innerHTML = markdownParser(e.target.innerHTML, lastOffsetKey, 'bold');
+//       } else if (italic.test(e.target.innerHTML)) {
+//         //@ts-ignore
+//         this._element.innerHTML = markdownParser(e.target.innerHTML, lastOffsetKey, 'italic');
+//       }
+//       const element = document.querySelector(`[data-offset-key="${time}-${lastOffsetKey}"]`);
+//       lastOffsetKey += 1;
+//       if (element) {
+//         const s = window.getSelection();
+//         const r = document.createRange();
+//         r.setStart(element, 0);
+//         r.setEnd(element, 0);
+//         s?.removeAllRanges();
+//         s?.addRange(r);
+//       }
+//     });
+//   }
+// }
 
 const initialData = () => {
   return {
@@ -83,10 +82,6 @@ const Editor = () => {
     };
   }, []);
 
-  useEffect(() => {
-    console.log(editorData);
-  }, [editorData]);
-
   const initEditor = () => {
     const editor = new EditorJS({
       holder: 'editorjs',
@@ -100,16 +95,10 @@ const Editor = () => {
         if (event.type !== 'block-changed') {
           return;
         }
-        const id: string = event.detail.target.id;
 
         const content = await api.saver.save();
-        let currentBlock = content.blocks.find((item) => item.id === id);
 
-        const updatedBlocks = {
-          time: new Date().getTime(),
-          blocks: content.blocks.map((item) => (item.id === id ? { ...item, data: { ...currentBlock?.data } } : item))
-        };
-        setEditorData({ ...updatedBlocks });
+        setEditorData({ time: new Date().getTime(), blocks: content.blocks });
       },
       autofocus: true,
       tools: {
@@ -126,7 +115,7 @@ const Editor = () => {
         },
         paragraph: {
           //@ts-ignore
-          class: MyParagraph,
+          class: Paragraph,
           inlineToolbar: true,
           config: {
             preserveBlank: true
