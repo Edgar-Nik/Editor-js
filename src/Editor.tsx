@@ -6,7 +6,7 @@ import RawTool from '@editorjs/raw';
 import SimpleImage from '@editorjs/simple-image';
 import { useEffect, useRef, useState } from 'react';
 import DragDrop from 'editorjs-drag-drop';
-import { CustomParagraph } from './MarkerTool';
+import { Paragraph } from './Paragraph';
 const Header = require('@editorjs/header');
 
 const initialData = () => {
@@ -92,11 +92,16 @@ const Editor = () => {
             }
           }
         },
-        myOwnParagraph: {
-          class: CustomParagraph
-        }
+        paragraph: {
+          //@ts-ignore
+          class: Paragraph,
+          inlineToolbar: true,
+          config: {
+            preserveBlank: true
+          }
+        },
       },
-      defaultBlock: 'myOwnParagraph'
+      defaultBlock: 'paragraph'
     });
   };
 
