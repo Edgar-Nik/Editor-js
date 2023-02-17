@@ -6,6 +6,7 @@ import RawTool from '@editorjs/raw';
 import SimpleImage from '@editorjs/simple-image';
 import { useEffect, useRef, useState } from 'react';
 import DragDrop from 'editorjs-drag-drop';
+import { CustomSimpleImage } from './MarkerTool';
 const Header = require('@editorjs/header');
 
 const initialData = () => {
@@ -17,12 +18,6 @@ const initialData = () => {
         data: {
           text: 'Hello)',
           level: 1
-        }
-      },
-      {
-        type: "image",
-        data: {
-          "url": "https://images.hgmsites.net/hug/nissan-gt-r_100758125_h.jpg"
         }
       }
     ]
@@ -53,8 +48,8 @@ const Editor = () => {
         ejInstance.current = editor;
         new DragDrop(editor);
       },
-      onChange: async (e) => {
-        let content = await e.saver.save();
+      onChange: async (api) => {
+        let content = await api.saver.save();
 
         setEditorData({ time: content.time ?? new Date().getTime(), blocks: content.blocks });
       },
@@ -97,7 +92,11 @@ const Editor = () => {
             }
           }
         },
-      }
+        myOwnParagraph: {
+          class: CustomSimpleImage
+        }
+      },
+      defaultBlock: 'myOwnParagraph'
     });
   };
 
