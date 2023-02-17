@@ -1,4 +1,4 @@
-export class CustomSimpleImage {
+export class CustomParagraph {
   data: any;
   api: any;
   paragraph: HTMLParagraphElement | undefined;

@@ -6,7 +6,7 @@ import RawTool from '@editorjs/raw';
 import SimpleImage from '@editorjs/simple-image';
 import { useEffect, useRef, useState } from 'react';
 import DragDrop from 'editorjs-drag-drop';
-import { CustomSimpleImage } from './MarkerTool';
+import { CustomParagraph } from './MarkerTool';
 const Header = require('@editorjs/header');
 
 const initialData = () => {
@@ -93,7 +93,7 @@ const Editor = () => {
           }
         },
         myOwnParagraph: {
-          class: CustomSimpleImage
+          class: CustomParagraph
         }
       },
       defaultBlock: 'myOwnParagraph'
