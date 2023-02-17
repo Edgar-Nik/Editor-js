@@ -3,8 +3,6 @@ import EditorParagraph from '@editorjs/paragraph'
 export class Paragraph extends EditorParagraph {
   constructor({ data, api, config, readOnly, block }) {
     super({ data, api, config, readOnly, block });
-    this.data = data;
-    this.api = api
 
     this._element.addEventListener('keyup', (event) => {
       if (event.target?.innerHTML.includes('#')) {
