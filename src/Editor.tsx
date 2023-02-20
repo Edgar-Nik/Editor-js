@@ -1,23 +1,22 @@
 import Checklist from '@editorjs/checklist';
 import EditorJS from '@editorjs/editorjs';
+import Header from '@editorjs/header';
+import { Paragraph } from './Paragraph';
 import Embed from '@editorjs/embed';
 import List from '@editorjs/list';
 import RawTool from '@editorjs/raw';
 import SimpleImage from '@editorjs/simple-image';
 import { useEffect, useRef, useState } from 'react';
 import DragDrop from 'editorjs-drag-drop';
-import { Paragraph } from './Paragraph';
-const Header = require('@editorjs/header');
 
 const initialData = () => {
   return {
     time: new Date().getTime(),
     blocks: [
       {
-        type: 'header',
+        type: 'paragraph',
         data: {
-          text: 'Hello)',
-          level: 1
+          text: ''
         }
       }
     ]
@@ -49,13 +48,14 @@ const Editor = () => {
         new DragDrop(editor);
       },
       onChange: async (api) => {
-        let content = await api.saver.save();
+        const content = await api.saver.save();
 
-        setEditorData({ time: content.time ?? new Date().getTime(), blocks: content.blocks });
+        setEditorData({ time: new Date().getTime(), blocks: content.blocks });
       },
       autofocus: true,
       tools: {
         header: {
+          //@ts-ignore
           class: Header,
           inlineToolbar: ['link'],
           shortcut: 'CMD+SHIFT+H',
@@ -68,7 +68,7 @@ const Editor = () => {
         checklist: {
           class: Checklist,
           inlineToolbar: true,
-          shortcut: 'CMD+SHIFT+L',
+          shortcut: 'CMD+SHIFT+L'
         },
         list: {
           class: List,
@@ -99,7 +99,7 @@ const Editor = () => {
           config: {
             preserveBlank: true
           }
-        },
+        }
       },
       defaultBlock: 'paragraph'
     });

@@ -1,4 +1,4 @@
-import EditorParagraph from '@editorjs/paragraph'
+import EditorParagraph from '@editorjs/paragraph';
 
 const bold = /\*\*(.*)\*\*/gim;
 const strike = /~(.*)~/gim;
@@ -18,24 +18,24 @@ export class Paragraph extends EditorParagraph {
     super({ data, api, config, readOnly, block });
 
     this._element.addEventListener('keyup', (event) => {
-      const enteredText = event.target?.innerHTML
+      const enteredText = event.target?.innerHTML;
 
       if (enteredText.includes('#')) {
         this._checkHeading(enteredText);
       }
       if (enteredText.match(triggers)) {
         this._textModify(enteredText);
-    }
-    })
+      }
+    });
   }
 
   _checkHeading(text) {
     if (text.startsWith('#&nbsp') || text.startsWith('# ')) {
-      this._createHeading(1, text)
+      this._createHeading(1, text);
     } else if (text.startsWith('##&nbsp') || text.startsWith('## ')) {
-      this._createHeading(2, text)
+      this._createHeading(2, text);
     } else if (text.startsWith('###&nbsp') || text.startsWith('### ')) {
-      this._createHeading(3, text)
+      this._createHeading(3, text);
     }
 
     // if (heading1.test(text)) {
@@ -45,7 +45,7 @@ export class Paragraph extends EditorParagraph {
     // } else if (heading3.test(text)) {
     //   this._createHeading(3, text)
     // }
-  };
+  }
 
   _textModify(text) {
     if (bold.test(text)) {
@@ -71,26 +71,25 @@ export class Paragraph extends EditorParagraph {
     }
   }
 
-
-
   markdownParser = (text, offsetKey, tag) => {
     let tmp = text;
     let helpers = `&#8203;<span data-offset-key="${time}-${offsetKey}"></span>`;
 
     switch (tag) {
-      case ('bold'):
-        return tmp.replace(bold, `<b>$1</b>${helpers}`)
+      case 'bold':
+        return tmp.replace(bold, `<b>$1</b>${helpers}`);
 
-      case ('italic'):
-        return tmp.replace(italic, `<i>$1</i>${helpers}`)
+      case 'italic':
+        return tmp.replace(italic, `<i>$1</i>${helpers}`);
 
-      case ('strike'):
-        return tmp.replace(strike, `<strike>$1</strike>${helpers}`)
+      case 'strike':
+        return tmp.replace(strike, `<strike>$1</strike>${helpers}`);
 
-      case ('code'):
-        return tmp.replace(code, `<code>$1</code>${helpers}`)
-        
-      default: return tmp
+      case 'code':
+        return tmp.replace(code, `<code>$1</code>${helpers}`);
+
+      default:
+        return tmp;
     }
   };
 
@@ -111,4 +110,4 @@ export class Paragraph extends EditorParagraph {
 
     this.api.caret.setToBlock(currentElementIndex);
   }
-};
+}
