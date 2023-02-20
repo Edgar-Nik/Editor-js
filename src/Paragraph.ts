@@ -1,13 +1,14 @@
 import EditorParagraph from '@editorjs/paragraph';
+import { TextEditorTools, ToolsType } from './types';
 
 const bold = /\*\*(.*)\*\*/gim;
 const strike = /~(.*)~/gim;
 const italic = /(?<!\*)\*(?![*\s])(?:([^*]*[^*\s]))?\*/gim;
 const code = /```(.*)```/gim;
-const heading3 = /^###&nbsp;(.*)|^### (.*)/gim;
-const heading2 = /^##&nbsp;(.*)|^### (.*)/gim;
-const heading1 = /^#&nbsp;(.*)|^### (.*)/gim;
-const heading = /#+&nbsp;|#+ (.*)/gim;
+const heading1 = /(^#(\s|&nbsp;))(.*)/gim;
+const heading2 = /(^##(\s|&nbsp;))(.*)/gim;
+const heading3 = /(^###(\s|&nbsp;))(.*)/gim;
+// const heading = /#+&nbsp;|#+ (.*)/gim;
 const triggers = /\*|~|`/gim;
 const unorderedList = /((^\*(\s|&nbsp;))|(^-(\s|&nbsp;))|(^\+(\s|&nbsp;)))(.*)/gim;
 const orderedList = /((^1\.(\s|&nbsp;))|(^a\.(\s|&nbsp;))|(^i\.(\s|&nbsp;)))(.*)/gim;
@@ -38,21 +39,13 @@ export class Paragraph extends EditorParagraph {
   }
 
   _checkHeading(text: string) {
-    if (text.startsWith('#&nbsp') || text.startsWith('# ')) {
+    if (heading1.test(text)) {
       this._createHeader(1, text);
-    } else if (text.startsWith('##&nbsp') || text.startsWith('## ')) {
+    } else if (heading2.test(text)) {
       this._createHeader(2, text);
-    } else if (text.startsWith('###&nbsp') || text.startsWith('### ')) {
+    } else if (heading3.test(text)) {
       this._createHeader(3, text);
     }
-
-    // if (heading1.test(text)) {
-    //   this._createHeader(1, text)
-    // } else if (heading2.test(text)) {
-    //   this._createHeader(2, text)
-    // } else if (heading3.test(text)) {
-    //   this._createHeader(3, text)
-    // }
   }
 
   _textModify(text: string) {
@@ -79,7 +72,7 @@ export class Paragraph extends EditorParagraph {
     }
   }
 
-  markdownParser = (text: string, offsetKey: number, tag: 'bold' | 'italic' | 'strike' | 'code') => {
+  markdownParser = (text: string, offsetKey: number, tag: TextEditorTools) => {
     let tmp = text;
     let helpers = `&#8203;<span data-offset-key="${time}-${offsetKey}"></span>`;
 
@@ -132,7 +125,7 @@ export class Paragraph extends EditorParagraph {
     this._createElement('checklist', data)
   }
 
-  _createElement(type: 'header' | 'list' | 'checklist', data: Record<string, any>) {
+  _createElement(type: ToolsType, data: Record<string, any>) {
     const currentElementIndex = this.api.blocks.getCurrentBlockIndex();
 
     this.api.blocks.delete(currentElementIndex);
