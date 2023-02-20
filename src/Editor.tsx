@@ -1,7 +1,7 @@
 import Checklist from '@editorjs/checklist';
 import EditorJS from '@editorjs/editorjs';
 import Header from '@editorjs/header';
-import Paragraph from './paragraph';
+import { Paragraph } from './Paragraph';
 import Embed from '@editorjs/embed';
 import List from '@editorjs/list';
 import RawTool from '@editorjs/raw';
@@ -47,12 +47,7 @@ const Editor = () => {
         ejInstance.current = editor;
         new DragDrop(editor);
       },
-
-      onChange: async (api, event) => {
-        if (event.type !== 'block-changed') {
-          return;
-        }
-
+      onChange: async (api) => {
         const content = await api.saver.save();
 
         setEditorData({ time: new Date().getTime(), blocks: content.blocks });
@@ -68,14 +63,6 @@ const Editor = () => {
             placeholder: 'Enter a header',
             levels: [1, 2, 3, 4],
             defaultLevel: 2
-          }
-        },
-        paragraph: {
-          //@ts-ignore
-          class: Paragraph,
-          inlineToolbar: true,
-          config: {
-            preserveBlank: true
           }
         },
         checklist: {
@@ -104,8 +91,17 @@ const Editor = () => {
               coub: true
             }
           }
+        },
+        paragraph: {
+          //@ts-ignore
+          class: Paragraph,
+          inlineToolbar: true,
+          config: {
+            preserveBlank: true
+          }
         }
-      }
+      },
+      defaultBlock: 'paragraph'
     });
   };
 
