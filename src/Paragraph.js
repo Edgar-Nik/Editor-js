@@ -8,7 +8,7 @@ const heading3 = /^###&nbsp;(.*)|^### (.*)/gim;
 const heading2 = /^##&nbsp;(.*)|^### (.*)/gim;
 const heading1 = /^#&nbsp;(.*)|^### (.*)/gim;
 const heading = /#+&nbsp;|#+ (.*)/gim;
-const triggers = ['*', '~', '`']
+const triggers = /\*|~|`/gim;
 
 let lastOffsetKey = 1;
 const time = new Date().getTime();
@@ -23,27 +23,27 @@ export class Paragraph extends EditorParagraph {
       if (enteredText.includes('#')) {
         this._checkHeading(enteredText);
       }
-      if (triggers.includes(event.key)) {
+      if (enteredText.match(triggers)) {
         this._textModify(enteredText);
-      }
+    }
     })
   }
 
   _checkHeading(text) {
     if (text.startsWith('#&nbsp') || text.startsWith('# ')) {
-      this._createElement(1, text)
+      this._createHeading(1, text)
     } else if (text.startsWith('##&nbsp') || text.startsWith('## ')) {
-      this._createElement(2, text)
+      this._createHeading(2, text)
     } else if (text.startsWith('###&nbsp') || text.startsWith('### ')) {
-      this._createElement(3, text)
+      this._createHeading(3, text)
     }
 
     // if (heading1.test(text)) {
-    //   this._createElement(1, text)
+    //   this._createHeading(1, text)
     // } else if (heading2.test(text)) {
-    //   this._createElement(2, text)
+    //   this._createHeading(2, text)
     // } else if (heading3.test(text)) {
-    //   this._createElement(3, text)
+    //   this._createHeading(3, text)
     // }
   };
 
@@ -77,19 +77,6 @@ export class Paragraph extends EditorParagraph {
     let tmp = text;
     let helpers = `&#8203;<span data-offset-key="${time}-${offsetKey}"></span>`;
 
-
-  // if (tag === 'bold') {
-  //   return tmp.replace(bold, `<b>$1</b>${helpers}`);
-  // } else if (tag === 'italic') {
-  //   return tmp.replace(italic, `<i>$1</i>${helpers}`);
-  // } else if (tag === 'strike') {
-  //   return tmp.replace(strike, `<strike>$1</strike>${helpers}`);
-  // } else if (tag === 'code') {
-  //   return tmp.replace(code, `<code>$1</code>${helpers}`);
-  // }
-
-  // return tmp;
-
     switch (tag) {
       case ('bold'):
         return tmp.replace(bold, `<b>$1</b>${helpers}`)
@@ -107,7 +94,7 @@ export class Paragraph extends EditorParagraph {
     }
   };
 
-  _createElement(level, text) {
+  _createHeading(level, text) {
     const currentElementIndex = this.api.blocks.getCurrentBlockIndex();
 
     this.api.blocks.delete(currentElementIndex);
