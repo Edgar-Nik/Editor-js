@@ -11,15 +11,16 @@ const heading = /#+&nbsp;|#+ (.*)/gim;
 const triggers = /\*|~|`/gim;
 const unorderedList = /((^\*(\s|&nbsp;))|(^-(\s|&nbsp;))|(^\+(\s|&nbsp;)))(.*)/gim;
 const orderedList = /((^1\.(\s|&nbsp;))|(^a\.(\s|&nbsp;))|(^i\.(\s|&nbsp;)))(.*)/gim;
+const checklist = /(^\[\](\s|&nbsp;))(.*)/gim;
 
 let lastOffsetKey = 1;
 const time = new Date().getTime();
 
 export class Paragraph extends EditorParagraph {
-  constructor({ data, api, config, readOnly, block }) {
+  constructor({ data, api, config, readOnly, block }: any) {
     super({ data, api, config, readOnly, block });
 
-    this._element.addEventListener('keyup', (event) => {
+    this._element.addEventListener('keyup', (event: any) => {
       const enteredText = event.target?.innerHTML;
 
       if (enteredText.startsWith('#')) {
@@ -28,31 +29,33 @@ export class Paragraph extends EditorParagraph {
         this._createList(enteredText);
       } else if (enteredText.match(orderedList)) {
         this._createList(enteredText, 'ordered');
+      } else if (enteredText.match(checklist)) {
+        this._createCheckList(enteredText);
       } else if (enteredText.match(triggers)) {
         this._textModify(enteredText);
       }
     });
   }
 
-  _checkHeading(text) {
+  _checkHeading(text: string) {
     if (text.startsWith('#&nbsp') || text.startsWith('# ')) {
-      this._createHeading(1, text);
+      this._createHeader(1, text);
     } else if (text.startsWith('##&nbsp') || text.startsWith('## ')) {
-      this._createHeading(2, text);
+      this._createHeader(2, text);
     } else if (text.startsWith('###&nbsp') || text.startsWith('### ')) {
-      this._createHeading(3, text);
+      this._createHeader(3, text);
     }
 
     // if (heading1.test(text)) {
-    //   this._createHeading(1, text)
+    //   this._createHeader(1, text)
     // } else if (heading2.test(text)) {
-    //   this._createHeading(2, text)
+    //   this._createHeader(2, text)
     // } else if (heading3.test(text)) {
-    //   this._createHeading(3, text)
+    //   this._createHeader(3, text)
     // }
   }
 
-  _textModify(text) {
+  _textModify(text: string) {
     if (bold.test(text)) {
       this._element.innerHTML = this.markdownParser(text, lastOffsetKey, 'bold');
     } else if (italic.test(text)) {
@@ -76,7 +79,7 @@ export class Paragraph extends EditorParagraph {
     }
   }
 
-  markdownParser = (text, offsetKey, tag) => {
+  markdownParser = (text: string, offsetKey: number, tag: 'bold' | 'italic' | 'strike' | 'code') => {
     let tmp = text;
     let helpers = `&#8203;<span data-offset-key="${time}-${offsetKey}"></span>`;
 
@@ -98,39 +101,42 @@ export class Paragraph extends EditorParagraph {
     }
   };
 
-  _createHeading(level, text) {
-    const currentElementIndex = this.api.blocks.getCurrentBlockIndex();
+  _createHeader(level: number, text: string) {
+    const data = {
+      text: text.replaceAll('#', ''),
+      level
+    }
 
-    this.api.blocks.delete(currentElementIndex);
-
-    this.api.blocks.insert(
-      'header',
-      {
-        text: text.replaceAll('#', ''),
-        level
-      },
-      undefined,
-      currentElementIndex
-    );
-
-    this.api.caret.setToBlock(currentElementIndex);
+    this._createElement('header', data)
   }
 
-  _createList(text, style = 'unordered') {
+  _createList(text: string, style: 'unordered' | 'ordered' = 'unordered') {
+    const data = {
+      style,
+      items: [text.replace(style === 'unordered' ? unorderedList : orderedList, '$8')]
+    }
+
+    this._createElement('list', data)
+  }
+
+  _createCheckList(text: string) {
+    const data = {
+      items: [
+        {
+          text: text.replace(checklist, '$3'),
+          checked: false
+        }
+      ]
+    }
+
+    this._createElement('checklist', data)
+  }
+
+  _createElement(type: 'header' | 'list' | 'checklist', data: Record<string, any>) {
     const currentElementIndex = this.api.blocks.getCurrentBlockIndex();
 
     this.api.blocks.delete(currentElementIndex);
-
-    this.api.blocks.insert(
-      'list',
-      {
-        style,
-        items: [text.replace(style === 'unordered' ? unorderedList : orderedList, '$8')]
-      },
-      undefined,
-      currentElementIndex
-    );
-
+    this.api.blocks.insert(type, data, undefined, currentElementIndex);
     this.api.caret.setToBlock(currentElementIndex);
   }
 }
