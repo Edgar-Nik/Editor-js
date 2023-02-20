@@ -9,6 +9,8 @@ const heading2 = /^##&nbsp;(.*)|^### (.*)/gim;
 const heading1 = /^#&nbsp;(.*)|^### (.*)/gim;
 const heading = /#+&nbsp;|#+ (.*)/gim;
 const triggers = /\*|~|`/gim;
+const unorderedList = /((^\*(\s|&nbsp;))|(^-(\s|&nbsp;))|(^\+(\s|&nbsp;)))(.*)/gim;
+const orderedList = /((^1\.(\s|&nbsp;))|(^a\.(\s|&nbsp;))|(^i\.(\s|&nbsp;)))(.*)/gim;
 
 let lastOffsetKey = 1;
 const time = new Date().getTime();
@@ -20,10 +22,13 @@ export class Paragraph extends EditorParagraph {
     this._element.addEventListener('keyup', (event) => {
       const enteredText = event.target?.innerHTML;
 
-      if (enteredText.includes('#')) {
+      if (enteredText.startsWith('#')) {
         this._checkHeading(enteredText);
-      }
-      if (enteredText.match(triggers)) {
+      } else if (enteredText.match(unorderedList)) {
+        this._createList(enteredText);
+      } else if (enteredText.match(orderedList)) {
+        this._createList(enteredText, 'ordered');
+      } else if (enteredText.match(triggers)) {
         this._textModify(enteredText);
       }
     });
@@ -103,6 +108,24 @@ export class Paragraph extends EditorParagraph {
       {
         text: text.replaceAll('#', ''),
         level
+      },
+      undefined,
+      currentElementIndex
+    );
+
+    this.api.caret.setToBlock(currentElementIndex);
+  }
+
+  _createList(text, style = 'unordered') {
+    const currentElementIndex = this.api.blocks.getCurrentBlockIndex();
+
+    this.api.blocks.delete(currentElementIndex);
+
+    this.api.blocks.insert(
+      'list',
+      {
+        style,
+        items: [text.replace(style === 'unordered' ? unorderedList : orderedList, '$8')]
       },
       undefined,
       currentElementIndex
