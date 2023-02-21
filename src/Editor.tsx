@@ -1,22 +1,30 @@
+import { useEffect, useRef, useState } from 'react';
+import DragDrop from 'editorjs-drag-drop';
 import Checklist from '@editorjs/checklist';
 import EditorJS from '@editorjs/editorjs';
 import Header from '@editorjs/header';
-import { Paragraph } from './Paragraph';
 import Embed from '@editorjs/embed';
 import List from '@editorjs/list';
 import RawTool from '@editorjs/raw';
 import SimpleImage from '@editorjs/simple-image';
-import { useEffect, useRef, useState } from 'react';
-import DragDrop from 'editorjs-drag-drop';
+import { Divider } from './Divider';
+import { Paragraph } from './Paragraph';
 
 const initialData = () => {
   return {
     time: new Date().getTime(),
     blocks: [
       {
-        type: 'paragraph',
+        type: 'header',
         data: {
-          text: ''
+          text: '',
+          level: 1
+        }
+      },
+      {
+        type: 'divider',
+        data: {
+          type: 'hr'
         }
       }
     ]
@@ -99,7 +107,8 @@ const Editor = () => {
           config: {
             preserveBlank: true
           }
-        }
+        },
+        divider: Divider
       },
       defaultBlock: 'paragraph'
     });
